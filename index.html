@@ -1,130 +1,319 @@
-<script>
-const TOTAL_DAYS = 1826;
-const STORAGE_KEY = "projeto_5_anos_v2";
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projeto 5 Anos</title>
 
-let data = {
-    days: [],
-    score: 0
-};
+<style>
+body {
+    margin: 0;
+    padding: 20px;
+    background: #0d0d0d;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+h1 {
+    margin-top: 20px;
+}
+
+.caixa {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #1a1a1a;
+    border-radius: 15px;
+}
+
+.numero {
+    font-size: 40px;
+    font-weight: bold;
+}
+
+button {
+    width: 100%;
+    padding: 18px;
+    margin-top: 15px;
+    border: 0;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    background: white;
+    color: black;
+}
+
+button:disabled {
+    opacity: 0.5;
+}
+
+.barra {
+    height: 15px;
+    background: #333;
+    border-radius: 20px;
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+.progresso {
+    height: 100%;
+    width: 0%;
+    background: white;
+}
+
+p {
+    color: #aaa;
+}
+</style>
+</head>
+
+<body>
+
+<h1>PROJETO 5 ANOS</h1>
+
+<p>1.826 dias de consistência</p>
+
+<div class="caixa">
+
+<h2>Dias feitos</h2>
+<div class="numero" id="dias">0</div>
+
+</div>
+
+<div class="caixa">
+
+<h2>Sequência</h2>
+<div class="numero" id="sequencia">0</div>
+
+</div>
+
+<div class="caixa">
+
+<h2>Placar</h2>
+<div class="numero" id="placar">0</div>
+
+</div>
+
+<div class="caixa">
+
+<button id="botao" onclick="marcarPresenca()">
+MARCAR PRESENÇA HOJE
+</button>
+
+<p id="mensagem">
+Você ainda não marcou presença hoje.
+</p>
+
+</div>
+
+<div class="caixa">
+
+<h2>Progresso</h2>
+
+<div class="barra">
+<div class="progresso" id="progresso"></div>
+</div>
+
+<p id="textoProgresso">
+0 / 1.826 dias
+</p>
+
+</div>
+
+<div class="caixa">
+
+<h2>Mensagem</h2>
+
+<p id="motivacao">
+Comece hoje. Um dia de cada vez.
+</p>
+
+</div>
+
+<script>
+
+var TOTAL = 1826;
+
+var dias = [];
+var placar = 0;
 
 try {
-    const saved = localStorage.getItem(STORAGE_KEY);
 
-    if (saved) {
-        data = JSON.parse(saved);
+    var dadosSalvos =
+        localStorage.getItem("projeto5anos");
+
+    if (dadosSalvos) {
+
+        var dados =
+            JSON.parse(dadosSalvos);
+
+        dias = dados.dias || [];
+        placar = dados.placar || 0;
+
     }
-} catch (e) {
-    data = {
-        days: [],
-        score: 0
-    };
+
+} catch (erro) {
+
+    dias = [];
+    placar = 0;
+
 }
 
-function hoje() {
-    const d = new Date();
 
-    return d.getFullYear() + "-" +
-        String(d.getMonth() + 1).padStart(2, "0") + "-" +
-        String(d.getDate()).padStart(2, "0");
+function dataHoje() {
+
+    var agora = new Date();
+
+    var ano = agora.getFullYear();
+
+    var mes = String(
+        agora.getMonth() + 1
+    ).padStart(2, "0");
+
+    var dia = String(
+        agora.getDate()
+    ).padStart(2, "0");
+
+    return ano + "-" + mes + "-" + dia;
 }
+
 
 function salvar() {
-    try {
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(data)
-        );
-    } catch (e) {
-        console.log("Não foi possível salvar.");
-    }
+
+    localStorage.setItem(
+        "projeto5anos",
+        JSON.stringify({
+            dias: dias,
+            placar: placar
+        })
+    );
+
 }
 
-function sequencia() {
-    let total = 0;
-    let d = new Date();
+
+function marcarPresenca() {
+
+    var hoje = dataHoje();
+
+    if (dias.indexOf(hoje) !== -1) {
+        return;
+    }
+
+    dias.push(hoje);
+
+    placar += 10;
+
+    salvar();
+
+    atualizar();
+
+}
+
+
+function calcularSequencia() {
+
+    var total = 0;
+
+    var data = new Date();
 
     while (true) {
 
-        const dataAtual =
-            d.getFullYear() + "-" +
-            String(d.getMonth() + 1).padStart(2, "0") + "-" +
-            String(d.getDate()).padStart(2, "0");
+        var ano = data.getFullYear();
 
-        if (!data.days.includes(dataAtual)) {
+        var mes = String(
+            data.getMonth() + 1
+        ).padStart(2, "0");
+
+        var dia = String(
+            data.getDate()
+        ).padStart(2, "0");
+
+        var atual =
+            ano + "-" + mes + "-" + dia;
+
+        if (dias.indexOf(atual) === -1) {
             break;
         }
 
         total++;
 
-        d.setDate(d.getDate() - 1);
+        data.setDate(
+            data.getDate() - 1
+        );
+
     }
 
     return total;
+
 }
+
 
 function atualizar() {
 
-    const hojeAtual = hoje();
-    const marcou = data.days.includes(hojeAtual);
+    var hoje = dataHoje();
 
-    document.getElementById("days").textContent =
-        data.days.length;
+    document.getElementById("dias")
+        .innerText = dias.length;
 
-    document.getElementById("score").textContent =
-        data.score;
+    document.getElementById("placar")
+        .innerText = placar;
 
-    document.getElementById("streak").textContent =
-        sequencia();
+    document.getElementById("sequencia")
+        .innerText = calcularSequencia();
 
-    const porcentagem =
-        Math.min(100, (data.days.length / TOTAL_DAYS) * 100);
+    var percentual =
+        (dias.length / TOTAL) * 100;
 
-    document.getElementById("progress").style.width =
-        porcentagem + "%";
+    if (percentual > 100) {
+        percentual = 100;
+    }
 
-    document.getElementById("progressText").textContent =
-        data.days.length + " / " +
-        TOTAL_DAYS + " dias — " +
-        porcentagem.toFixed(2) + "%";
+    document.getElementById("progresso")
+        .style.width = percentual + "%";
 
-    const botao =
-        document.getElementById("presence");
+    document.getElementById("textoProgresso")
+        .innerText =
+        dias.length +
+        " / " +
+        TOTAL +
+        " dias — " +
+        percentual.toFixed(2) +
+        "%";
 
-    if (marcou) {
+    var botao =
+        document.getElementById("botao");
+
+    if (dias.indexOf(hoje) !== -1) {
 
         botao.disabled = true;
-        botao.textContent = "PRESENÇA MARCADA ✓";
 
-        document.getElementById("status").textContent =
-            "Você já marcou presença hoje.";
+        botao.innerText =
+            "PRESENÇA MARCADA ✓";
+
+        document.getElementById("mensagem")
+            .innerText =
+            "Presença registrada hoje.";
 
     } else {
 
         botao.disabled = false;
-        botao.textContent =
+
+        botao.innerText =
             "MARCAR PRESENÇA HOJE";
 
-        document.getElementById("status").textContent =
+        document.getElementById("mensagem")
+            .innerText =
             "Você ainda não marcou presença hoje.";
-    }
-}
 
-function marcarPresenca() {
-
-    const dataHoje = hoje();
-
-    if (data.days.includes(dataHoje)) {
-        return;
     }
 
-    data.days.push(dataHoje);
-
-    data.score += 10;
-
-    salvar();
-
-    atualizar();
 }
+
 
 atualizar();
+
 </script>
+
+</body>
+</html>
