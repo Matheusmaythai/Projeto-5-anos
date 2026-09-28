@@ -80,4 +80,366 @@ button {
 }
 
 button:disabled {
-    opacity:
+    opacity: 0.5;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 15px;
+    background: #292e36;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 15px;
+}
+
+.progress {
+    height: 100%;
+    width: 0%;
+    background: white;
+    transition: 0.3s;
+}
+
+.motivation {
+    font-size: 19px;
+    line-height: 1.5;
+}
+
+.small {
+    color: #999;
+    font-size: 13px;
+}
+
+@media (max-width: 500px) {
+    .stats {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>PROJETO 5 ANOS</h1>
+
+<div class="subtitle">
+1.826 dias de consistência
+</div>
+
+
+<div class="card">
+
+<div class="stats">
+
+<div class="stat">
+<div class="number" id="days">0</div>
+<div class="label">DIAS FEITOS</div>
+</div>
+
+<div class="stat">
+<div class="number" id="streak">0</div>
+<div class="label">SEQUÊNCIA</div>
+</div>
+
+<div class="stat">
+<div class="number" id="score">0</div>
+<div class="label">PLACAR</div>
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<button id="presence" type="button">
+MARCAR PRESENÇA HOJE
+</button>
+
+<p class="small" id="status">
+Você ainda não marcou presença hoje.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<strong>PROGRESSO</strong>
+
+<div class="progress-bar">
+<div class="progress" id="progress"></div>
+</div>
+
+<p class="small" id="progressText">
+0 / 1.826 dias — 0%
+</p>
+
+</div>
+
+
+<div class="card">
+
+<strong>MENSAGEM</strong>
+
+<p class="motivation" id="motivation">
+Comece hoje. Um dia de cada vez.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<strong>REGRAS DO PLACAR</strong>
+
+<p class="small">
+Presença: +10 pontos.
+<br>
+Dia perdido: -5 pontos.
+<br>
+O placar nunca fica abaixo de zero.
+</p>
+
+</div>
+
+</div>
+
+
+<script>
+
+const TOTAL_DAYS = 1826;
+
+const STORAGE_KEY = "projeto_5_anos";
+
+const messages = [
+
+"Comece hoje. Um dia de cada vez.",
+
+"Faça o que precisa ser feito.",
+
+"Não negocie com sua meta.",
+
+"Consistência vence a desculpa.",
+
+"Mais um dia concluído.",
+
+"Continue. O resultado vem da repetição.",
+
+"Seu trabalho de hoje conta.",
+
+"Não pare porque ficou difícil."
+
+];
+
+
+let data;
+
+try {
+
+data = JSON.parse(
+localStorage.getItem(STORAGE_KEY)
+);
+
+} catch (error) {
+
+data = null;
+
+}
+
+
+if (
+!data ||
+!Array.isArray(data.days) ||
+typeof data.score !== "number"
+) {
+
+data = {
+days: [],
+score: 0
+};
+
+}
+
+
+function getToday() {
+
+const date = new Date();
+
+const year = date.getFullYear();
+
+const month =
+String(date.getMonth() + 1).padStart(2, "0");
+
+const day =
+String(date.getDate()).padStart(2, "0");
+
+return year + "-" + month + "-" + day;
+
+}
+
+
+function saveData() {
+
+localStorage.setItem(
+STORAGE_KEY,
+JSON.stringify(data)
+);
+
+}
+
+
+function calculateStreak() {
+
+let streak = 0;
+
+const date = new Date();
+
+while (true) {
+
+const year = date.getFullYear();
+
+const month =
+String(date.getMonth() + 1).padStart(2, "0");
+
+const day =
+String(date.getDate()).padStart(2, "0");
+
+const dateString =
+year + "-" + month + "-" + day;
+
+if (!data.days.includes(dateString)) {
+break;
+}
+
+streak++;
+
+date.setDate(
+date.getDate() - 1
+);
+
+}
+
+return streak;
+
+}
+
+
+function updateSite() {
+
+const today = getToday();
+
+const alreadyMarked =
+data.days.includes(today);
+
+const streak =
+calculateStreak();
+
+const percentage =
+Math.min(
+100,
+(data.days.length / TOTAL_DAYS) * 100
+);
+
+
+document.getElementById("days")
+.textContent = data.days.length;
+
+
+document.getElementById("streak")
+.textContent = streak;
+
+
+document.getElementById("score")
+.textContent = data.score;
+
+
+const button =
+document.getElementById("presence");
+
+
+if (alreadyMarked) {
+
+button.disabled = true;
+
+button.textContent =
+"PRESENÇA MARCADA ✓";
+
+document.getElementById("status")
+.textContent =
+"Você já marcou presença hoje.";
+
+} else {
+
+button.disabled = false;
+
+button.textContent =
+"MARCAR PRESENÇA HOJE";
+
+document.getElementById("status")
+.textContent =
+"Você ainda não marcou presença hoje.";
+
+}
+
+
+document.getElementById("progress")
+.style.width =
+percentage + "%";
+
+
+document.getElementById("progressText")
+.textContent =
+data.days.length +
+" / " +
+TOTAL_DAYS +
+" dias — " +
+percentage.toFixed(2) +
+"%";
+
+
+document.getElementById("motivation")
+.textContent =
+messages[
+data.days.length % messages.length
+];
+
+}
+
+
+document
+.getElementById("presence")
+.addEventListener("click", function() {
+
+const today = getToday();
+
+
+if (data.days.includes(today)) {
+
+return;
+
+}
+
+
+data.days.push(today);
+
+
+data.score += 10;
+
+
+saveData();
+
+
+updateSite();
+
+});
+
+
+updateSite();
+
+</script>
+
+</body>
+</html>
