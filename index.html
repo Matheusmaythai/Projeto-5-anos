@@ -23,20 +23,20 @@ h1 {
 
 .subtitulo {
     text-align: center;
-    color: #aaa;
+    color: #999;
 }
 
 .caixa {
-    max-width: 500px;
+    max-width: 520px;
     margin: 20px auto;
     padding: 20px;
     background: #1a1a1a;
-    border-radius: 15px;
+    border-radius: 16px;
 }
 
 .numero {
     text-align: center;
-    font-size: 40px;
+    font-size: 42px;
     font-weight: bold;
 }
 
@@ -49,6 +49,10 @@ h1 {
     background: #111;
     border-radius: 12px;
     cursor: pointer;
+}
+
+.tarefa:active {
+    transform: scale(0.98);
 }
 
 .quadrado {
@@ -80,29 +84,19 @@ h1 {
     font-weight: bold;
 }
 
+.xp {
+    margin-left: auto;
+    color: #aaa;
+    font-weight: bold;
+}
+
 .status {
     text-align: center;
     color: #aaa;
 }
 
-button {
-    width: 100%;
-    padding: 16px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 12px;
-    font-size: 17px;
-    font-weight: bold;
-    background: white;
-    color: black;
-}
-
-button:disabled {
-    opacity: 0.5;
-}
-
 .barra {
-    height: 15px;
+    height: 18px;
     background: #333;
     border-radius: 20px;
     overflow: hidden;
@@ -113,12 +107,23 @@ button:disabled {
     height: 100%;
     width: 0%;
     background: white;
+    transition: width 0.3s;
 }
 
 .motivacao {
     text-align: center;
-    font-size: 18px;
+    font-size: 19px;
     line-height: 1.5;
+}
+
+.botao-reset {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 10px;
+    background: #333;
+    color: white;
 }
 
 </style>
@@ -129,13 +134,24 @@ button:disabled {
 <h1>PROJETO 5 ANOS</h1>
 
 <p class="subtitulo">
-1.826 dias de consistência
+1.826 dias de evolução
 </p>
 
 
 <div class="caixa">
 
-<h2>DIAS COMPLETOS</h2>
+<h2>⭐ XP TOTAL</h2>
+
+<div class="numero" id="xp">
+0
+</div>
+
+</div>
+
+
+<div class="caixa">
+
+<h2>📅 DIAS COM ATIVIDADE</h2>
 
 <div class="numero" id="dias">
 0
@@ -146,7 +162,7 @@ button:disabled {
 
 <div class="caixa">
 
-<h2>SEQUÊNCIA</h2>
+<h2>🔥 SEQUÊNCIA</h2>
 
 <div class="numero" id="sequencia">
 0
@@ -157,30 +173,23 @@ button:disabled {
 
 <div class="caixa">
 
-<h2>PLACAR</h2>
-
-<div class="numero" id="placar">
-0
-</div>
-
-</div>
-
-
-<div class="caixa">
-
-<h2>HOJE</h2>
+<h2>🎯 TAREFAS DE HOJE</h2>
 
 <p class="status" id="status">
-Marque o que você cumpriu hoje.
+Escolha o que você fez hoje.
 </p>
 
 
 <div class="tarefa" onclick="marcar('treino')">
 
-<div class="quadrado" id="quadrado-treino"></div>
+<div class="quadrado" id="q-treino"></div>
 
 <div class="nome-tarefa">
 🥊 Treino
+</div>
+
+<div class="xp">
++30 XP
 </div>
 
 </div>
@@ -188,21 +197,29 @@ Marque o que você cumpriu hoje.
 
 <div class="tarefa" onclick="marcar('estudo')">
 
-<div class="quadrado" id="quadrado-estudo"></div>
+<div class="quadrado" id="q-estudo"></div>
 
 <div class="nome-tarefa">
 📚 Estudo
 </div>
 
+<div class="xp">
++20 XP
+</div>
+
 </div>
 
 
-<div class="tarefa" onclick="marcar('alimentacao')">
+<div class="tarefa" onclick="marcar('dieta')">
 
-<div class="quadrado" id="quadrado-alimentacao"></div>
+<div class="quadrado" id="q-dieta"></div>
 
 <div class="nome-tarefa">
-🍽️ Alimentação
+🍽️ Dieta
+</div>
+
+<div class="xp">
++20 XP
 </div>
 
 </div>
@@ -210,10 +227,14 @@ Marque o que você cumpriu hoje.
 
 <div class="tarefa" onclick="marcar('semPornografia')">
 
-<div class="quadrado" id="quadrado-semPornografia"></div>
+<div class="quadrado" id="q-semPornografia"></div>
 
 <div class="nome-tarefa">
 🚫 Sem pornografia
+</div>
+
+<div class="xp">
++30 XP
 </div>
 
 </div>
@@ -223,12 +244,10 @@ Marque o que você cumpriu hoje.
 
 <div class="caixa">
 
-<h2>PROGRESSO</h2>
+<h2>📈 PROGRESSO</h2>
 
 <div class="barra">
-
 <div class="progresso" id="progresso"></div>
-
 </div>
 
 <p class="status" id="textoProgresso">
@@ -240,10 +259,10 @@ Marque o que você cumpriu hoje.
 
 <div class="caixa">
 
-<h2>MENSAGEM</h2>
+<h2>🔥 MOTIVAÇÃO</h2>
 
 <p class="motivacao" id="motivacao">
-Comece hoje. Um dia de cada vez.
+Comece. Não precisa fazer tudo de uma vez.
 </p>
 
 </div>
@@ -251,11 +270,19 @@ Comece hoje. Um dia de cada vez.
 
 <script>
 
-var TOTAL = 1826;
+var TOTAL_DIAS = 1826;
+
+var XP = {
+    treino: 30,
+    estudo: 20,
+    dieta: 20,
+    semPornografia: 30
+};
+
 
 var dados = {
+    xp: 0,
     dias: [],
-    placar: 0,
     tarefas: {}
 };
 
@@ -263,7 +290,7 @@ var dados = {
 try {
 
     var salvo =
-        localStorage.getItem("projeto5anos_v2");
+        localStorage.getItem("projeto5anos_xp");
 
     if (salvo) {
 
@@ -274,8 +301,8 @@ try {
 } catch (erro) {
 
     dados = {
+        xp: 0,
         dias: [],
-        placar: 0,
         tarefas: {}
     };
 
@@ -296,7 +323,7 @@ function hoje() {
 function salvar() {
 
     localStorage.setItem(
-        "projeto5anos_v2",
+        "projeto5anos_xp",
         JSON.stringify(dados)
     );
 
@@ -309,17 +336,33 @@ function marcar(tarefa) {
 
     if (!dados.tarefas[data]) {
 
-        dados.tarefas[data] = {
-            treino: false,
-            estudo: false,
-            alimentacao: false,
-            semPornografia: false
-        };
+        dados.tarefas[data] = {};
 
     }
 
-    dados.tarefas[data][tarefa] =
-        !dados.tarefas[data][tarefa];
+
+    var marcado =
+        dados.tarefas[data][tarefa] === true;
+
+
+    if (marcado) {
+
+        dados.tarefas[data][tarefa] = false;
+
+        dados.xp -= XP[tarefa];
+
+        if (dados.xp < 0) {
+            dados.xp = 0;
+        }
+
+    } else {
+
+        dados.tarefas[data][tarefa] = true;
+
+        dados.xp += XP[tarefa];
+
+    }
+
 
     verificarDia(data);
 
@@ -332,49 +375,47 @@ function marcar(tarefa) {
 
 function verificarDia(data) {
 
-    var t = dados.tarefas[data];
+    var tarefas =
+        dados.tarefas[data] || {};
 
-    if (!t) {
-        return;
-    }
+    var fezAlgumaCoisa =
+        tarefas.treino ||
+        tarefas.estudo ||
+        tarefas.dieta ||
+        tarefas.semPornografia;
 
-    var completo =
-        t.treino &&
-        t.estudo &&
-        t.alimentacao &&
-        t.semPornografia;
 
-    var jaContado =
+    var jaTemDia =
         dados.dias.includes(data);
 
-    if (completo && !jaContado) {
+
+    if (fezAlgumaCoisa && !jaTemDia) {
 
         dados.dias.push(data);
 
-        dados.placar += 10;
-
     }
 
-    if (!completo && jaContado) {
+
+    if (!fezAlgumaCoisa && jaTemDia) {
 
         dados.dias =
             dados.dias.filter(function(d) {
-                return d !== data;
-            });
 
-        dados.placar =
-            Math.max(0, dados.placar - 10);
+                return d !== data;
+
+            });
 
     }
 
 }
 
 
-function sequencia() {
+function calcularSequencia() {
 
     var total = 0;
 
     var d = new Date();
+
 
     while (true) {
 
@@ -383,9 +424,13 @@ function sequencia() {
             String(d.getMonth() + 1).padStart(2, "0") + "-" +
             String(d.getDate()).padStart(2, "0");
 
+
         if (!dados.dias.includes(data)) {
+
             break;
+
         }
+
 
         total++;
 
@@ -395,7 +440,27 @@ function sequencia() {
 
     }
 
+
     return total;
+
+}
+
+
+function marcarQuadrado(id, ativo) {
+
+    var elemento =
+        document.getElementById(id);
+
+
+    if (ativo) {
+
+        elemento.classList.add("marcado");
+
+    } else {
+
+        elemento.classList.remove("marcado");
+
+    }
 
 }
 
@@ -404,62 +469,64 @@ function atualizar() {
 
     var data = hoje();
 
-    if (!dados.tarefas[data]) {
+    var tarefas =
+        dados.tarefas[data] || {};
 
-        dados.tarefas[data] = {
-            treino: false,
-            estudo: false,
-            alimentacao: false,
-            semPornografia: false
-        };
 
-    }
-
-    var t = dados.tarefas[data];
+    document.getElementById("xp")
+        .innerText = dados.xp;
 
 
     document.getElementById("dias")
         .innerText = dados.dias.length;
 
 
-    document.getElementById("placar")
-        .innerText = dados.placar;
-
-
     document.getElementById("sequencia")
-        .innerText = sequencia();
+        .innerText = calcularSequencia();
 
 
     marcarQuadrado(
-        "quadrado-treino",
-        t.treino
+        "q-treino",
+        tarefas.treino === true
     );
 
 
     marcarQuadrado(
-        "quadrado-estudo",
-        t.estudo
+        "q-estudo",
+        tarefas.estudo === true
     );
 
 
     marcarQuadrado(
-        "quadrado-alimentacao",
-        t.alimentacao
+        "q-dieta",
+        tarefas.dieta === true
     );
 
 
     marcarQuadrado(
-        "quadrado-semPornografia",
-        t.semPornografia
+        "q-semPornografia",
+        tarefas.semPornografia === true
     );
 
 
     var quantidade = 0;
 
-    if (t.treino) quantidade++;
-    if (t.estudo) quantidade++;
-    if (t.alimentacao) quantidade++;
-    if (t.semPornografia) quantidade++;
+
+    if (tarefas.treino) {
+        quantidade++;
+    }
+
+    if (tarefas.estudo) {
+        quantidade++;
+    }
+
+    if (tarefas.dieta) {
+        quantidade++;
+    }
+
+    if (tarefas.semPornografia) {
+        quantidade++;
+    }
 
 
     document.getElementById("status")
@@ -469,7 +536,7 @@ function atualizar() {
 
 
     var percentual =
-        (dados.dias.length / TOTAL) * 100;
+        (dados.dias.length / TOTAL_DIAS) * 100;
 
 
     if (percentual > 100) {
@@ -486,51 +553,54 @@ function atualizar() {
         .innerText =
         dados.dias.length +
         " / " +
-        TOTAL +
+        TOTAL_DIAS +
         " dias — " +
         percentual.toFixed(2) +
         "%";
 
 
-    if (quantidade === 4) {
-
-        document.getElementById("motivacao")
-            .innerText =
-            "Dia completo. Você fez o que precisava ser feito.";
-
-    } else if (quantidade > 0) {
-
-        document.getElementById("motivacao")
-            .innerText =
-            "Continue. Ainda faltam " +
-            (4 - quantidade) +
-            " tarefas.";
-
-    } else {
-
-        document.getElementById("motivacao")
-            .innerText =
-            "Comece. Um dia de cada vez.";
-
-    }
+    atualizarMotivacao(
+        quantidade
+    );
 
 }
 
 
-function marcarQuadrado(id, marcado) {
+function atualizarMotivacao(quantidade) {
 
-    var elemento =
-        document.getElementById(id);
+    var frases = [
 
-    if (marcado) {
+        "Não espere vontade. Comece.",
 
-        elemento.classList.add("marcado");
+        "Um pouco feito hoje vale mais que muito planejado.",
 
-    } else {
+        "Disciplina é continuar mesmo quando a vontade some.",
 
-        elemento.classList.remove("marcado");
+        "Você não precisa ser perfeito. Precisa continuar.",
 
-    }
+        "Cada tarefa concluída é XP para a sua evolução.",
+
+        "Faça o que precisa ser feito.",
+
+        "Mais um dia. Mais um passo.",
+
+        "A constância vai construir o resultado.",
+
+        "Não negocie com a sua meta.",
+
+        "Continue. Você está construindo sua própria história."
+
+    ];
+
+
+    var indice =
+        (dados.xp + quantidade) %
+        frases.length;
+
+
+    document.getElementById("motivacao")
+        .innerText =
+        frases[indice];
 
 }
 
@@ -540,4 +610,4 @@ atualizar();
 </script>
 
 </body>
-</html> 
+</html>
