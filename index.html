@@ -3,20 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Projeto 5 Anos</title>
 
 <style>
+
 body {
     margin: 0;
     padding: 20px;
     background: #0d0d0d;
     color: white;
     font-family: Arial, sans-serif;
-    text-align: center;
 }
 
 h1 {
+    text-align: center;
     margin-top: 20px;
+}
+
+.subtitulo {
+    text-align: center;
+    color: #aaa;
 }
 
 .caixa {
@@ -28,17 +35,63 @@ h1 {
 }
 
 .numero {
+    text-align: center;
     font-size: 40px;
     font-weight: bold;
 }
 
+.tarefa {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    margin: 10px 0;
+    background: #111;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.quadrado {
+    width: 30px;
+    height: 30px;
+    border: 2px solid #777;
+    border-radius: 7px;
+    flex-shrink: 0;
+}
+
+.quadrado.marcado {
+    background: white;
+    border-color: white;
+    position: relative;
+}
+
+.quadrado.marcado::after {
+    content: "✓";
+    color: black;
+    font-size: 22px;
+    font-weight: bold;
+    position: absolute;
+    left: 5px;
+    top: 0px;
+}
+
+.nome-tarefa {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.status {
+    text-align: center;
+    color: #aaa;
+}
+
 button {
     width: 100%;
-    padding: 18px;
-    margin-top: 15px;
-    border: 0;
+    padding: 16px;
+    margin-top: 10px;
+    border: none;
     border-radius: 12px;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: bold;
     background: white;
     color: black;
@@ -52,8 +105,8 @@ button:disabled {
     height: 15px;
     background: #333;
     border-radius: 20px;
-    margin-top: 15px;
     overflow: hidden;
+    margin-top: 15px;
 }
 
 .progresso {
@@ -62,9 +115,12 @@ button:disabled {
     background: white;
 }
 
-p {
-    color: #aaa;
+.motivacao {
+    text-align: center;
+    font-size: 18px;
+    line-height: 1.5;
 }
+
 </style>
 </head>
 
@@ -72,137 +128,200 @@ p {
 
 <h1>PROJETO 5 ANOS</h1>
 
-<p>1.826 dias de consistência</p>
-
-<div class="caixa">
-
-<h2>Dias feitos</h2>
-<div class="numero" id="dias">0</div>
-
-</div>
-
-<div class="caixa">
-
-<h2>Sequência</h2>
-<div class="numero" id="sequencia">0</div>
-
-</div>
-
-<div class="caixa">
-
-<h2>Placar</h2>
-<div class="numero" id="placar">0</div>
-
-</div>
-
-<div class="caixa">
-
-<button id="botao" onclick="marcarPresenca()">
-MARCAR PRESENÇA HOJE
-</button>
-
-<p id="mensagem">
-Você ainda não marcou presença hoje.
+<p class="subtitulo">
+1.826 dias de consistência
 </p>
 
-</div>
 
 <div class="caixa">
 
-<h2>Progresso</h2>
+<h2>DIAS COMPLETOS</h2>
 
-<div class="barra">
-<div class="progresso" id="progresso"></div>
+<div class="numero" id="dias">
+0
 </div>
 
-<p id="textoProgresso">
+</div>
+
+
+<div class="caixa">
+
+<h2>SEQUÊNCIA</h2>
+
+<div class="numero" id="sequencia">
+0
+</div>
+
+</div>
+
+
+<div class="caixa">
+
+<h2>PLACAR</h2>
+
+<div class="numero" id="placar">
+0
+</div>
+
+</div>
+
+
+<div class="caixa">
+
+<h2>HOJE</h2>
+
+<p class="status" id="status">
+Marque o que você cumpriu hoje.
+</p>
+
+
+<div class="tarefa" onclick="marcar('treino')">
+
+<div class="quadrado" id="quadrado-treino"></div>
+
+<div class="nome-tarefa">
+🥊 Treino
+</div>
+
+</div>
+
+
+<div class="tarefa" onclick="marcar('estudo')">
+
+<div class="quadrado" id="quadrado-estudo"></div>
+
+<div class="nome-tarefa">
+📚 Estudo
+</div>
+
+</div>
+
+
+<div class="tarefa" onclick="marcar('alimentacao')">
+
+<div class="quadrado" id="quadrado-alimentacao"></div>
+
+<div class="nome-tarefa">
+🍽️ Alimentação
+</div>
+
+</div>
+
+
+<div class="tarefa" onclick="marcar('semPornografia')">
+
+<div class="quadrado" id="quadrado-semPornografia"></div>
+
+<div class="nome-tarefa">
+🚫 Sem pornografia
+</div>
+
+</div>
+
+</div>
+
+
+<div class="caixa">
+
+<h2>PROGRESSO</h2>
+
+<div class="barra">
+
+<div class="progresso" id="progresso"></div>
+
+</div>
+
+<p class="status" id="textoProgresso">
 0 / 1.826 dias
 </p>
 
 </div>
 
+
 <div class="caixa">
 
-<h2>Mensagem</h2>
+<h2>MENSAGEM</h2>
 
-<p id="motivacao">
+<p class="motivacao" id="motivacao">
 Comece hoje. Um dia de cada vez.
 </p>
 
 </div>
 
+
 <script>
 
 var TOTAL = 1826;
 
-var dias = [];
-var placar = 0;
+var dados = {
+    dias: [],
+    placar: 0,
+    tarefas: {}
+};
+
 
 try {
 
-    var dadosSalvos =
-        localStorage.getItem("projeto5anos");
+    var salvo =
+        localStorage.getItem("projeto5anos_v2");
 
-    if (dadosSalvos) {
+    if (salvo) {
 
-        var dados =
-            JSON.parse(dadosSalvos);
-
-        dias = dados.dias || [];
-        placar = dados.placar || 0;
+        dados = JSON.parse(salvo);
 
     }
 
 } catch (erro) {
 
-    dias = [];
-    placar = 0;
+    dados = {
+        dias: [],
+        placar: 0,
+        tarefas: {}
+    };
 
 }
 
 
-function dataHoje() {
+function hoje() {
 
-    var agora = new Date();
+    var d = new Date();
 
-    var ano = agora.getFullYear();
+    return d.getFullYear() + "-" +
+        String(d.getMonth() + 1).padStart(2, "0") + "-" +
+        String(d.getDate()).padStart(2, "0");
 
-    var mes = String(
-        agora.getMonth() + 1
-    ).padStart(2, "0");
-
-    var dia = String(
-        agora.getDate()
-    ).padStart(2, "0");
-
-    return ano + "-" + mes + "-" + dia;
 }
 
 
 function salvar() {
 
     localStorage.setItem(
-        "projeto5anos",
-        JSON.stringify({
-            dias: dias,
-            placar: placar
-        })
+        "projeto5anos_v2",
+        JSON.stringify(dados)
     );
 
 }
 
 
-function marcarPresenca() {
+function marcar(tarefa) {
 
-    var hoje = dataHoje();
+    var data = hoje();
 
-    if (dias.indexOf(hoje) !== -1) {
-        return;
+    if (!dados.tarefas[data]) {
+
+        dados.tarefas[data] = {
+            treino: false,
+            estudo: false,
+            alimentacao: false,
+            semPornografia: false
+        };
+
     }
 
-    dias.push(hoje);
+    dados.tarefas[data][tarefa] =
+        !dados.tarefas[data][tarefa];
 
-    placar += 10;
+    verificarDia(data);
 
     salvar();
 
@@ -211,35 +330,67 @@ function marcarPresenca() {
 }
 
 
-function calcularSequencia() {
+function verificarDia(data) {
+
+    var t = dados.tarefas[data];
+
+    if (!t) {
+        return;
+    }
+
+    var completo =
+        t.treino &&
+        t.estudo &&
+        t.alimentacao &&
+        t.semPornografia;
+
+    var jaContado =
+        dados.dias.includes(data);
+
+    if (completo && !jaContado) {
+
+        dados.dias.push(data);
+
+        dados.placar += 10;
+
+    }
+
+    if (!completo && jaContado) {
+
+        dados.dias =
+            dados.dias.filter(function(d) {
+                return d !== data;
+            });
+
+        dados.placar =
+            Math.max(0, dados.placar - 10);
+
+    }
+
+}
+
+
+function sequencia() {
 
     var total = 0;
 
-    var data = new Date();
+    var d = new Date();
 
     while (true) {
 
-        var ano = data.getFullYear();
+        var data =
+            d.getFullYear() + "-" +
+            String(d.getMonth() + 1).padStart(2, "0") + "-" +
+            String(d.getDate()).padStart(2, "0");
 
-        var mes = String(
-            data.getMonth() + 1
-        ).padStart(2, "0");
-
-        var dia = String(
-            data.getDate()
-        ).padStart(2, "0");
-
-        var atual =
-            ano + "-" + mes + "-" + dia;
-
-        if (dias.indexOf(atual) === -1) {
+        if (!dados.dias.includes(data)) {
             break;
         }
 
         total++;
 
-        data.setDate(
-            data.getDate() - 1
+        d.setDate(
+            d.getDate() - 1
         );
 
     }
@@ -251,60 +402,133 @@ function calcularSequencia() {
 
 function atualizar() {
 
-    var hoje = dataHoje();
+    var data = hoje();
+
+    if (!dados.tarefas[data]) {
+
+        dados.tarefas[data] = {
+            treino: false,
+            estudo: false,
+            alimentacao: false,
+            semPornografia: false
+        };
+
+    }
+
+    var t = dados.tarefas[data];
+
 
     document.getElementById("dias")
-        .innerText = dias.length;
+        .innerText = dados.dias.length;
+
 
     document.getElementById("placar")
-        .innerText = placar;
+        .innerText = dados.placar;
+
 
     document.getElementById("sequencia")
-        .innerText = calcularSequencia();
+        .innerText = sequencia();
+
+
+    marcarQuadrado(
+        "quadrado-treino",
+        t.treino
+    );
+
+
+    marcarQuadrado(
+        "quadrado-estudo",
+        t.estudo
+    );
+
+
+    marcarQuadrado(
+        "quadrado-alimentacao",
+        t.alimentacao
+    );
+
+
+    marcarQuadrado(
+        "quadrado-semPornografia",
+        t.semPornografia
+    );
+
+
+    var quantidade = 0;
+
+    if (t.treino) quantidade++;
+    if (t.estudo) quantidade++;
+    if (t.alimentacao) quantidade++;
+    if (t.semPornografia) quantidade++;
+
+
+    document.getElementById("status")
+        .innerText =
+        quantidade +
+        " de 4 tarefas concluídas hoje.";
+
 
     var percentual =
-        (dias.length / TOTAL) * 100;
+        (dados.dias.length / TOTAL) * 100;
+
 
     if (percentual > 100) {
         percentual = 100;
     }
 
+
     document.getElementById("progresso")
-        .style.width = percentual + "%";
+        .style.width =
+        percentual + "%";
+
 
     document.getElementById("textoProgresso")
         .innerText =
-        dias.length +
+        dados.dias.length +
         " / " +
         TOTAL +
         " dias — " +
         percentual.toFixed(2) +
         "%";
 
-    var botao =
-        document.getElementById("botao");
 
-    if (dias.indexOf(hoje) !== -1) {
+    if (quantidade === 4) {
 
-        botao.disabled = true;
-
-        botao.innerText =
-            "PRESENÇA MARCADA ✓";
-
-        document.getElementById("mensagem")
+        document.getElementById("motivacao")
             .innerText =
-            "Presença registrada hoje.";
+            "Dia completo. Você fez o que precisava ser feito.";
+
+    } else if (quantidade > 0) {
+
+        document.getElementById("motivacao")
+            .innerText =
+            "Continue. Ainda faltam " +
+            (4 - quantidade) +
+            " tarefas.";
 
     } else {
 
-        botao.disabled = false;
-
-        botao.innerText =
-            "MARCAR PRESENÇA HOJE";
-
-        document.getElementById("mensagem")
+        document.getElementById("motivacao")
             .innerText =
-            "Você ainda não marcou presença hoje.";
+            "Comece. Um dia de cada vez.";
+
+    }
+
+}
+
+
+function marcarQuadrado(id, marcado) {
+
+    var elemento =
+        document.getElementById(id);
+
+    if (marcado) {
+
+        elemento.classList.add("marcado");
+
+    } else {
+
+        elemento.classList.remove("marcado");
 
     }
 
@@ -316,4 +540,4 @@ atualizar();
 </script>
 
 </body>
-</html>
+</html> 
